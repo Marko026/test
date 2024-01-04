@@ -14,13 +14,19 @@ export const getFilteredCars = async (filters: Filters) => {
   try {
     const filterObject: { [key: string]: any } = {};
     if (filters?.searchParams?.type) {
+      const type = Array.isArray(filters.searchParams.type)
+        ? filters.searchParams.type[0]
+        : filters.searchParams.type;
       filterObject["type"] = {
-        in: filters.searchParams.type.split(","),
+        in: type.split(","),
       };
     }
     if (filters.searchParams.capacity) {
+      const capacity = Array.isArray(filters.searchParams.capacity)
+        ? filters.searchParams.capacity[0]
+        : filters.searchParams.capacity;
       filterObject["capacity"] = {
-        in: filters.searchParams.capacity.split(",").map(Number),
+        in: capacity.split(",").map(Number),
       };
     }
     if (filters.searchParams.rentPrice) {
@@ -29,8 +35,11 @@ export const getFilteredCars = async (filters: Filters) => {
       };
     }
     if (filters.searchParams.location) {
+      const location = Array.isArray(filters.searchParams.location)
+        ? filters.searchParams.location[0]
+        : filters.searchParams.location;
       filterObject["location"] = {
-        in: filters.searchParams.location.split(","),
+        in: location.split(","),
       };
     }
 
@@ -93,7 +102,9 @@ export const getMyOwnedCars = async (userId: number) => {
 };
 
 // Get my rented cars
-export const getMyRentedCars = async (userId: number): Promise<CarWithFavorite[]> => {
+export const getMyRentedCars = async (
+  userId: number
+): Promise<CarWithFavorite[]> => {
   try {
     const myRentedCars = await prisma.car.findMany({
       where: {
@@ -111,7 +122,9 @@ export const getMyRentedCars = async (userId: number): Promise<CarWithFavorite[]
   }
 };
 
-export const getAllCarsWithFavorites = async (userId: number): Promise<CarWithFavorite[]> => {
+export const getAllCarsWithFavorites = async (
+  userId: number
+): Promise<CarWithFavorite[]> => {
   try {
     const carsWithFavorites = await prisma.$queryRaw<CarWithFavorite[]>`
       SELECT c.*,
@@ -247,7 +260,19 @@ interface AddCarParams {
   userId: string;
 }
 
-export const addCar = async ({ title, type, price, capacity, transmission, location, fuelCapacity, description, images, blurDataURL, userId }: AddCarParams) => {
+export const addCar = async ({
+  title,
+  type,
+  price,
+  capacity,
+  transmission,
+  location,
+  fuelCapacity,
+  description,
+  images,
+  blurDataURL,
+  userId,
+}: AddCarParams) => {
   console.log(userId);
   try {
     const newCar = await prisma.car.create({
